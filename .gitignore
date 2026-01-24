@@ -1,0 +1,56 @@
+# Node & package managers
+node_modules/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env*.example
+
+# Build outputs (frontend/backend)
+dist/
+build/
+.next/
+out/
+
+# Vite
+.vite/
+node_modules/.vite/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Caches & temp
+.cache/
+.eslintcache
+.stylelintcache
+tmp/
+temp/
+.tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local overrides
+*.local
+
+# Hosting/platform
+.vercel/
+
+# TypeScript build info
+*.tsbuildinfo
+

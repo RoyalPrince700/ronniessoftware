@@ -114,15 +114,45 @@ const Sales = () => {
       const { sale } = response.data;
 
       setSaleCompleted(sale._id);
+
+      // Download PDF receipt
+      try {
+        const pdfResponse = await axios.get(`/api/staff/sales/${sale._id}/receipt/pdf`, {
+          responseType: 'blob'
+        });
+
+        // Create blob link to download
+        const url = window.URL.createObjectURL(new Blob([pdfResponse.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `receipt-${sale.saleNumber}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+
+        // Clean up
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (pdfError) {
+        console.error('Error downloading PDF:', pdfError);
+        // Still show success message even if PDF download fails
+        alert('Sale completed successfully! PDF receipt could not be downloaded.');
+      }
+
+      // Reset form
       setCart([]);
       setCustomerName('');
       setCustomerPhone('');
       setDiscount(0);
 
-      // Navigate to receipt
-      navigate(`/staff/receipt/${sale._id}`);
+      alert('Sale completed successfully! PDF receipt downloaded.');
     } catch (error) {
-      alert(error.response?.data?.message || 'Sale failed');
+      // Handle validation errors
+      if (error.response?.data?.errors) {
+        const errorMessages = error.response.data.errors.map(err => err.msg).join('\n');
+        alert(`Sale failed:\n${errorMessages}`);
+      } else {
+        alert(error.response?.data?.message || 'Sale failed');
+      }
     } finally {
       setLoading(false);
     }

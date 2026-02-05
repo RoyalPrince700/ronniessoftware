@@ -4,7 +4,13 @@
 
 /* Custom styles */
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors;
+  background-color: #ffc21f;
+  color: #000;
+  @apply font-medium py-2 px-4 rounded-md transition-colors;
+}
+
+.btn-primary:hover {
+  background-color: #e6a600;
 }
 
 .btn-secondary {
@@ -20,7 +26,11 @@
 }
 
 .input-field {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent;
+}
+
+.input-field:focus {
+  --tw-ring-color: #ffc21f;
 }
 
 /* Input variants */

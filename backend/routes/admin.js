@@ -271,7 +271,12 @@ router.get('/stock-history', async (req, res) => {
     if (dateFrom || dateTo) {
       query.date = {};
       if (dateFrom) query.date.$gte = new Date(dateFrom);
-      if (dateTo) query.date.$lte = new Date(dateTo);
+      if (dateTo) {
+        // Set dateTo to end of day (23:59:59.999) to include all entries from that day
+        const endOfDay = new Date(dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        query.date.$lte = endOfDay;
+      }
     }
 
     const stockHistory = await StockHistory.find(query)
@@ -309,11 +314,34 @@ router.get('/sales-report', async (req, res) => {
     if (dateFrom || dateTo) {
       query.saleDate = {};
       if (dateFrom) query.saleDate.$gte = new Date(dateFrom);
-      if (dateTo) query.saleDate.$lte = new Date(dateTo);
+      if (dateTo) {
+        // Set dateTo to end of day (23:59:59.999) to include all sales from that day
+        const endOfDay = new Date(dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        query.saleDate.$lte = endOfDay;
+      }
     }
 
     if (staffId) {
-      query.soldBy = staffId;
+      // Validate that the staffId is a valid ObjectId and belongs to an active staff member
+      const staffMember = await User.findOne({
+        _id: staffId,
+        role: 'staff',
+        isActive: true
+      });
+      if (staffMember) {
+        query.soldBy = staffId;
+      } else {
+        // If staff member not found, return empty results
+        return res.json({
+          sales: [],
+          summary: {
+            totalSales: 0,
+            totalTransactions: 0,
+            averageSale: 0
+          }
+        });
+      }
     }
 
     const sales = await Sale.find(query)
@@ -384,6 +412,55 @@ router.put('/users/:id/status', validateRequest({
     });
   } catch (error) {
     console.error('Update user status error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update user role
+router.put('/users/:id/role', validateRequest({
+  role: [validateRequired, (value) => {
+    if (!['admin', 'staff'].includes(value)) {
+      return 'Role must be admin or staff';
+    }
+    return null;
+  }]
+}), async (req, res) => {
+  try {
+    const { role } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Prevent admin from changing their own role
+    if (user._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({ message: 'Cannot change your own role' });
+    }
+
+    // Prevent the last admin from being demoted
+    if (user.role === 'admin' && role === 'staff') {
+      const adminCount = await User.countDocuments({ role: 'admin', isActive: true });
+      if (adminCount <= 1) {
+        return res.status(400).json({ message: 'Cannot demote the last active admin' });
+      }
+    }
+
+    user.role = role;
+    await user.save();
+
+    res.json({
+      message: `User role updated to ${role} successfully`,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        isActive: user.isActive
+      }
+    });
+  } catch (error) {
+    console.error('Update user role error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

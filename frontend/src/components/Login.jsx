@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock, Mail } from 'lucide-react';
+import logo from '../assets/ronniesfabricslogo.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -38,9 +39,11 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Ronnie's Fabrics
-          </h1>
+          <img
+            src={logo}
+            alt="Ronnie's Fabrics Logo"
+            className="h-16 mx-auto mb-4"
+          />
           <p className="text-gray-600">Fabric Inventory Management System</p>
         </div>
 

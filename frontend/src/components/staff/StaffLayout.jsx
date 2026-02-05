@@ -7,8 +7,10 @@ import {
   Receipt,
   LogOut,
   Menu,
-  User
+  User,
+  Shield
 } from 'lucide-react';
+import logo from '../../assets/ronniesfabricslogo.png';
 
 const StaffLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -41,11 +43,24 @@ const StaffLayout = ({ children }) => {
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
         <div className="flex items-center justify-center h-16 px-4 bg-green-600">
-          <h1 className="text-white text-xl font-bold">Staff Panel</h1>
+          <img
+            src={logo}
+            alt="Ronnie's Fabrics Logo"
+            className="h-10"
+          />
         </div>
 
         <nav className="mt-8">
           <div className="px-4 space-y-2">
+            {user?.role === 'admin' && (
+              <Link
+                to="/admin/dashboard"
+                className="flex items-center px-4 py-2 mb-4 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors shadow-sm"
+              >
+                <Shield className="mr-3 h-5 w-5" />
+                Admin Dashboard
+              </Link>
+            )}
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
@@ -97,7 +112,11 @@ const StaffLayout = ({ children }) => {
             >
               <Menu className="h-6 w-6" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900">Ronnie's Fabrics</h1>
+            <img
+              src={logo}
+              alt="Ronnie's Fabrics Logo"
+              className="h-8"
+            />
             <div></div>
           </div>
         </header>

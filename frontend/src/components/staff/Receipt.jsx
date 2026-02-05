@@ -25,8 +25,27 @@ const Receipt = () => {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    try {
+      const response = await axios.get(`/api/staff/sales/${saleId}/receipt/pdf`, {
+        responseType: 'blob'
+      });
+
+      // Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `receipt-${receipt?.saleNumber || saleId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Error downloading receipt PDF');
+    }
   };
 
   if (loading) {
@@ -57,7 +76,7 @@ const Receipt = () => {
           className="btn-primary flex items-center"
         >
           <Printer className="h-5 w-5 mr-2" />
-          Print Receipt
+          Download PDF Receipt
         </button>
       </div>
 

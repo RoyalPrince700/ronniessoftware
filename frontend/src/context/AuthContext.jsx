@@ -16,17 +16,40 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Configure axios base URL
+  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    const initAuth = async () => {
+      const savedToken = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
 
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
-    }
+      if (savedToken) {
+        setToken(savedToken);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+        
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
 
-    setLoading(false);
+        try {
+          const response = await axios.get('/api/auth/profile');
+          setUser(response.data.user);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        } catch (error) {
+          if (error.response?.status === 401 || error.response?.status === 403) {
+            setToken(null);
+            setUser(null);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            delete axios.defaults.headers.common['Authorization'];
+          }
+        }
+      }
+      setLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const login = async (email, password) => {

@@ -34,12 +34,8 @@ router.post('/signup', [
 
     await user.save();
 
-    // Generate token and log in the user
-    const token = generateToken(user._id);
-
     res.status(201).json({
-      message: 'Account created successfully',
-      token,
+      message: 'Registration successful. Please wait for admin approval.',
       user: {
         id: user._id,
         email: user.email,
@@ -132,7 +128,7 @@ router.post('/login', [
 
     // Check if user is active
     if (!user.isActive) {
-      return res.status(401).json({ message: 'Account is deactivated' });
+      return res.status(401).json({ message: 'Account is pending approval or deactivated' });
     }
 
     // Generate token

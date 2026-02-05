@@ -13,6 +13,7 @@ const Signup = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -45,20 +46,45 @@ const Signup = () => {
 
     try {
       await signup(formData.email, formData.password, formData.name);
-
-      // Redirect based on role (default is staff)
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/staff/dashboard');
-      }
+      setSuccess(true);
     } catch (error) {
       setError(error.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="max-w-md w-full space-y-8 p-8">
+          <div className="text-center">
+            <img
+              src={logo}
+              alt="Ronnie's Fabrics Logo"
+              className="h-16 mx-auto mb-4"
+            />
+            <div className="card text-center p-8">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+                <Lock className="h-6 w-6 text-yellow-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Registration Successful</h2>
+              <p className="text-gray-600 mb-6">
+                Your account has been created and is waiting for admin verification. 
+                Please contact an administrator to approve your account.
+              </p>
+              <Link 
+                to="/login" 
+                className="btn-primary w-full block text-center"
+              >
+                Back to Login
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">

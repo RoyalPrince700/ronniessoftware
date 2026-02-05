@@ -177,7 +177,7 @@ const Sales = () => {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field pl-10 w-64"
+                className="input-field input-has-icon-left w-64"
               />
             </div>
           </div>
